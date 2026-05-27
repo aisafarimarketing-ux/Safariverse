@@ -1,0 +1,14 @@
+{
+  "name": "safariverse",
+  "version": "0.0.0",
+  "private": true,
+  "description": "SafariVerse — cinematic AI-native universe for African safari travel",
+  "scripts": {
+    "preview": "serve design/handoff-2026-05-27/source --listen 5174 --no-clipboard",
+    "preview:landing": "echo Open http://localhost:5174/Landing.html",
+    "preview:edition": "echo Open http://localhost:5174/Edition.html"
+  },
+  "devDependencies": {
+    "serve": "^14.2.4"
+  }
+}

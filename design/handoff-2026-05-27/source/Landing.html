@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SafariVerse — Where the wild ones whisper</title>
+<link rel="stylesheet" href="editorial.css" />
+<style>
+  body { background: var(--canvas-deep); color: var(--ink-bright); overflow-x: hidden; }
+
+  /* ============ TOP BAR ============ */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 22px 40px;
+    transition: background 400ms var(--ease-out), backdrop-filter 400ms var(--ease-out);
+  }
+  .topbar.is-scrolled {
+    background: rgba(15,14,12,0.78);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--divider-dark);
+  }
+  .wordmark {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    color: var(--ink-bright);
+    text-decoration: none;
+  }
+  .wordmark sup {
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--ember);
+    margin-left: 6px;
+    vertical-align: super;
+  }
+  .topbar__nav { display: flex; gap: 32px; align-items: center; }
+  .topbar__link {
+    color: var(--ink-soft);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .topbar__link:hover { color: var(--ink-bright); }
+  .topbar__search {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(245,241,234,0.22);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--ink-soft);
+    background: transparent;
+  }
+  .topbar__avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: url('https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&q=80') center/cover;
+    border: 1px solid rgba(245,241,234,0.18);
+  }
+
+  /* ============ HERO ============ */
+  .hero {
+    position: relative;
+    height: 100vh;
+    min-height: 720px;
+    width: 100%;
+    overflow: hidden;
+    background: var(--canvas-deep);
+  }
+  .hero__photo {
+    position: absolute; inset: 0;
+    background: url('https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=2400&q=85') center/cover no-repeat;
+    animation: kenBurns 24s ease-in-out infinite alternate;
+  }
+  .hero__scrim {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(15,14,12,0.55) 0%, rgba(15,14,12,0) 22%, rgba(15,14,12,0) 55%, rgba(15,14,12,0.85) 100%),
+      linear-gradient(90deg, rgba(15,14,12,0.45) 0%, rgba(15,14,12,0) 50%);
+  }
+  .hero__content {
+    position: relative; z-index: 2;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 120px 56px 56px;
+  }
+  .hero__edition-mark {
+    display: flex; align-items: center; gap: 14px;
+    color: var(--ink-soft);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 10px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+  .hero__edition-mark::before {
+    content: ""; width: 36px; height: 1px; background: var(--ember);
+  }
+  .hero__center {
+    align-self: center;
+    max-width: 920px;
+  }
+  .hero__center h1 {
+    margin: 0;
+    color: var(--ink-bright);
+  }
+  .hero__rule {
+    width: 96px; height: 1px;
+    background: var(--ink-bright);
+    margin: 36px 0;
+    opacity: 0.6;
+  }
+  .hero__sub {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(20px, 2.2vw, 28px);
+    line-height: 1.4;
+    color: var(--ink-bright);
+    max-width: 640px;
+    margin: 0 0 48px;
+  }
+  .hero__foot {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  .hero__caption {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+  .hero__caption strong { color: var(--ink-bright); font-weight: 600; }
+  .hero__scroll-hint {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    color: var(--ink-soft);
+    font-size: 10px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+  .hero__scroll-hint::after {
+    content: ""; width: 1px; height: 48px;
+    background: linear-gradient(180deg, var(--ink-soft), transparent);
+  }
+
+  /* ============ SECTIONS ============ */
+  .section {
+    position: relative;
+    background: var(--paper-cream);
+    color: var(--ink-deep);
+    padding: 120px 56px;
+  }
+  .section--dark {
+    background: var(--canvas-deep);
+    color: var(--ink-bright);
+  }
+  .section__seam {
+    height: 80px;
+    background: linear-gradient(180deg, var(--canvas-deep) 0%, var(--paper-cream) 100%);
+  }
+  .section__head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 64px;
+    gap: 32px;
+  }
+  .section__head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: clamp(34px, 4.5vw, 56px);
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    max-width: 680px;
+  }
+  .section__head-right {
+    display: flex; flex-direction: column; gap: 12px;
+    max-width: 320px;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  /* ============ EDITIONS GRID ============ */
+  .editions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+  }
+  .poster {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    background: var(--paper-aged);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 500ms var(--ease-out);
+  }
+  .poster:hover { transform: translateY(-4px); }
+  .poster__photo {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    transition: transform 1200ms var(--ease-out);
+  }
+  .poster:hover .poster__photo { transform: scale(1.04); }
+  .poster__frame {
+    position: absolute; inset: 14px;
+    border: 1px solid rgba(245,241,234,0.6);
+    pointer-events: none; z-index: 3;
+  }
+  .poster__scrim {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(15,14,12,0.35) 0%, rgba(15,14,12,0) 30%, rgba(15,14,12,0) 50%, rgba(15,14,12,0.85) 100%);
+    z-index: 1;
+  }
+  .poster__inner {
+    position: absolute; inset: 14px;
+    z-index: 2;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 24px;
+    color: var(--ink-bright);
+  }
+  .poster__top {
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 9px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(245,241,234,0.85);
+  }
+  .poster__top span { display: inline-flex; align-items: center; gap: 8px; }
+  .poster__top span::before { content: "✦"; color: var(--ember); }
+  .poster__title {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 38px;
+    line-height: 1.0;
+    letter-spacing: 0.02em;
+    margin: 0;
+  }
+  .poster__meta {
+    margin-top: 12px;
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-weight: 300;
+    font-size: 14px;
+    color: rgba(245,241,234,0.85);
+  }
+  .poster__hairline {
+    width: 48px; height: 1px;
+    background: rgba(245,241,234,0.85);
+    margin-top: 14px;
+  }
+
+  /* ============ CREATORS ============ */
+  .creators {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+  .creator {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: var(--canvas-night);
+  }
+  .creator__photo {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    transition: transform 1500ms var(--ease-out);
+  }
+  .creator:hover .creator__photo { transform: scale(1.05); }
+  .creator__scrim {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(15,14,12,0) 50%, rgba(15,14,12,0.95) 100%);
+  }
+  .creator__body {
+    position: absolute; left: 24px; right: 24px; bottom: 24px;
+    color: var(--ink-bright);
+  }
+  .creator__name {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 26px;
+    line-height: 1.05;
+    margin: 0 0 6px;
+    letter-spacing: -0.005em;
+  }
+  .creator__role {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(245,241,234,0.75);
+  }
+  .creator__stat {
+    position: absolute;
+    top: 24px; right: 24px;
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 30px;
+    color: var(--ember-soft);
+  }
+
+  /* ============ PULL QUOTE ============ */
+  .quote {
+    max-width: 1080px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .quote__mark {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 96px;
+    line-height: 0.6;
+    color: var(--ember);
+    margin-bottom: 24px;
+    display: inline-block;
+  }
+  .quote__text {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(32px, 4vw, 52px);
+    line-height: 1.25;
+    color: var(--ink-deep);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .quote__cite {
+    margin-top: 40px;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .quote__cite::before {
+    content: "—"; margin-right: 8px;
+  }
+
+  /* ============ CONCIERGE ============ */
+  .concierge {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .concierge__photo {
+    aspect-ratio: 4 / 5;
+    background: url('https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=1400&q=85') center/cover;
+    position: relative;
+  }
+  .concierge__photo::after {
+    content: ""; position: absolute; inset: 14px;
+    border: 1px solid rgba(245,241,234,0.6);
+  }
+  .concierge__body {
+    max-width: 520px;
+  }
+  .concierge__quote {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(26px, 2.6vw, 36px);
+    line-height: 1.3;
+    color: var(--ink-deep);
+    margin: 32px 0;
+  }
+  .concierge__byline {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 32px;
+  }
+  .concierge__avatar {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: url('https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&q=80') center/cover;
+  }
+  .concierge__byline-meta { display: flex; flex-direction: column; gap: 2px; }
+  .concierge__byline-name { font-weight: 600; font-size: 15px; color: var(--ink-deep); }
+  .concierge__byline-role { font-size: 12px; color: var(--ink-muted); letter-spacing: 0.04em; }
+
+  /* ============ FOOTER ============ */
+  .footer {
+    background: var(--canvas-deep);
+    color: var(--ink-soft);
+    padding: 96px 56px 56px;
+  }
+  .footer__inner {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 64px;
+    padding-bottom: 56px;
+    border-bottom: 1px solid var(--divider-dark);
+  }
+  .footer__masthead {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 40px;
+    color: var(--ink-bright);
+    line-height: 1.05;
+    margin-bottom: 24px;
+  }
+  .footer__tag {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--ink-soft);
+    font-size: 16px;
+    max-width: 320px;
+    line-height: 1.5;
+  }
+  .footer__col h4 {
+    font-size: 10px; letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-bright);
+    margin: 0 0 20px;
+    font-weight: 600;
+  }
+  .footer__col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+  .footer__col a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    font-size: 13px;
+  }
+  .footer__col a:hover { color: var(--ink-bright); }
+  .footer__base {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 32px;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  /* ============ DARK BAND ============ */
+  .band-dark {
+    background: var(--canvas-deep);
+    color: var(--ink-bright);
+    padding: 120px 56px;
+  }
+  .band-dark .section__head h2 { color: var(--ink-bright); }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 920px) {
+    .topbar { padding: 18px 24px; }
+    .topbar__nav { display: none; }
+    .hero__content { padding: 96px 24px 32px; }
+    .section, .band-dark { padding: 80px 24px; }
+    .footer { padding: 64px 24px 32px; }
+    .editions { grid-template-columns: 1fr; gap: 32px; }
+    .creators { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .section__head { flex-direction: column; gap: 16px; margin-bottom: 40px; }
+    .section__head-right { align-items: flex-start; text-align: left; }
+    .concierge { grid-template-columns: 1fr; gap: 40px; }
+    .footer__inner { grid-template-columns: 1fr; gap: 40px; }
+    .footer__base { flex-direction: column; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <a href="index.html" class="wordmark">SafariVerse<sup>✦</sup></a>
+  <nav class="topbar__nav">
+    <a class="topbar__link" href="#editions">Editions</a>
+    <a class="topbar__link" href="#creators">Storytellers</a>
+    <a class="topbar__link" href="#">Destinations</a>
+    <a class="topbar__link" href="#">Studio</a>
+  </nav>
+  <div style="display:flex; gap:12px; align-items:center;">
+    <button class="topbar__search" aria-label="Search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    </button>
+    <div class="topbar__avatar" aria-label="Profile"></div>
+  </div>
+</header>
+
+<!-- ───── HERO ───── -->
+<section class="hero">
+  <div class="hero__photo"></div>
+  <div class="hero__scrim"></div>
+  <div class="hero__content">
+    <div class="hero__edition-mark">A Cinematic Travel Universe</div>
+
+    <div class="hero__center">
+      <h1 class="display display--xxl">Where the wild<br/>ones whisper.</h1>
+      <div class="hero__rule"></div>
+      <p class="hero__sub">A universe of African safari editions — dreamed by photographers, shaped by storytellers, and tailored, one journey at a time, by the people who live there.</p>
+      <a href="Honeymoon in Kenya.html" class="cta-pill">
+        <span class="cta-pill__glyph">✦</span>
+        Begin Dreaming
+        <span style="opacity:0.7">→</span>
+      </a>
+    </div>
+
+    <div class="hero__foot">
+      <div class="hero__caption">
+        Lewa Conservancy &nbsp;·&nbsp; Kenya<br/>
+        <strong>Photograph by Jane Doe</strong> &nbsp;·&nbsp; 2026 Edition
+      </div>
+      <div class="hero__scroll-hint">Scroll to enter</div>
+    </div>
+  </div>
+</section>
+
+<!-- ───── THIS WEEK'S EDITIONS ───── -->
+<section class="section" id="editions">
+  <div class="section__head">
+    <div>
+      <div class="eyebrow" style="margin-bottom: 20px;">This Week's Editions</div>
+      <h2>Twelve days, four<br/>dreams, one journey.</h2>
+    </div>
+    <div class="section__head-right">
+      <div class="caption">Editorial selections, refreshed every Thursday.<br/>Each Edition is one journey — readable, browsable, collectible.</div>
+      <a class="cta-ghost" href="#">All Editions →</a>
+    </div>
+  </div>
+
+  <div class="editions">
+    <!-- Edition 1 -->
+    <a class="poster" href="Honeymoon in Kenya.html">
+      <div class="poster__photo" style="background-image:url('https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1400&q=85');"></div>
+      <div class="poster__scrim"></div>
+      <div class="poster__frame"></div>
+      <div class="poster__inner">
+        <div class="poster__top">
+          <span>Edition 01</span>
+          <span style="opacity:0.7">Honeymoon</span>
+        </div>
+        <div>
+          <h3 class="poster__title">Honeymoon<br/>in Kenya</h3>
+          <div class="poster__hairline"></div>
+          <div class="poster__meta">twelve days · golden hour</div>
+        </div>
+      </div>
+    </a>
+
+    <!-- Edition 2 -->
+    <a class="poster" href="#">
+      <div class="poster__photo" style="background-image:url('https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=1400&q=85');"></div>
+      <div class="poster__scrim"></div>
+      <div class="poster__frame"></div>
+      <div class="poster__inner">
+        <div class="poster__top">
+          <span>Edition 02</span>
+          <span style="opacity:0.7">Migration</span>
+        </div>
+        <div>
+          <h3 class="poster__title">When the Mara<br/>Crosses</h3>
+          <div class="poster__hairline"></div>
+          <div class="poster__meta">eight days · the great migration</div>
+        </div>
+      </div>
+    </a>
+
+    <!-- Edition 3 -->
+    <a class="poster" href="#">
+      <div class="poster__photo" style="background-image:url('https://images.unsplash.com/photo-1535941339077-2dd1c7963098?w=1400&q=85');"></div>
+      <div class="poster__scrim"></div>
+      <div class="poster__frame"></div>
+      <div class="poster__inner">
+        <div class="poster__top">
+          <span>Edition 03</span>
+          <span style="opacity:0.7">Heritage</span>
+        </div>
+        <div>
+          <h3 class="poster__title">Slow Waters<br/>of Okavango</h3>
+          <div class="poster__hairline"></div>
+          <div class="poster__meta">ten days · river by mokoro</div>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ───── THROUGH THEIR LENS ───── -->
+<section class="band-dark" id="creators">
+  <div class="section__head">
+    <div>
+      <div class="eyebrow eyebrow--bright" style="margin-bottom: 20px; color: var(--ember);">Through Their Lens</div>
+      <h2>The storytellers<br/>who saw it first.</h2>
+    </div>
+    <div class="section__head-right">
+      <div class="caption" style="color: var(--ink-soft);">Every Edition begins with a photographer, a filmmaker, a guide. We credit the eye behind the image — beautifully.</div>
+      <a class="cta-ghost" href="#">All Storytellers →</a>
+    </div>
+  </div>
+
+  <div class="creators">
+    <a class="creator" href="#">
+      <div class="creator__photo" style="background-image:url('https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=900&q=85');"></div>
+      <div class="creator__scrim"></div>
+      <div class="creator__stat">14</div>
+      <div class="creator__body">
+        <h3 class="creator__name">Jane Doe</h3>
+        <div class="creator__role">Wildlife Photographer · Nairobi</div>
+      </div>
+    </a>
+    <a class="creator" href="#">
+      <div class="creator__photo" style="background-image:url('https://images.unsplash.com/photo-1492288991661-058aa541ff43?w=900&q=85');"></div>
+      <div class="creator__scrim"></div>
+      <div class="creator__stat">08</div>
+      <div class="creator__body">
+        <h3 class="creator__name">Mwende Otieno</h3>
+        <div class="creator__role">Filmmaker · Maasai Mara</div>
+      </div>
+    </a>
+    <a class="creator" href="#">
+      <div class="creator__photo" style="background-image:url('https://images.unsplash.com/photo-1542315192-1f61a1792f33?w=900&q=85');"></div>
+      <div class="creator__scrim"></div>
+      <div class="creator__stat">11</div>
+      <div class="creator__body">
+        <h3 class="creator__name">Ahmed Hassan</h3>
+        <div class="creator__role">Field Guide · Lewa</div>
+      </div>
+    </a>
+    <a class="creator" href="#">
+      <div class="creator__photo" style="background-image:url('https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=900&q=85');"></div>
+      <div class="creator__scrim"></div>
+      <div class="creator__stat">22</div>
+      <div class="creator__body">
+        <h3 class="creator__name">Lerato Nkosi</h3>
+        <div class="creator__role">Writer · Cape Town</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ───── QUOTE ───── -->
+<section class="section">
+  <div class="quote">
+    <span class="quote__mark">"</span>
+    <p class="quote__text">It didn't feel like booking a trip.<br/>It felt like being handed a beautifully bound dream — and then someone we'd never met spent six weeks making it real.</p>
+    <div class="quote__cite">Sarah Adeyemi &nbsp;·&nbsp; Honeymoon in Kenya &nbsp;·&nbsp; 2026</div>
+  </div>
+</section>
+
+<!-- ───── CONCIERGE ───── -->
+<section class="section" style="padding-top: 0;">
+  <div class="concierge">
+    <div class="concierge__photo"></div>
+    <div class="concierge__body">
+      <div class="eyebrow">Your Concierge</div>
+      <p class="concierge__quote">"I read every Edition, then I quietly take it apart and rebuild it around you. Your dates. Your pace. Your pair."</p>
+      <div class="concierge__byline">
+        <div class="concierge__avatar"></div>
+        <div class="concierge__byline-meta">
+          <div class="concierge__byline-name">Asha Mwangi</div>
+          <div class="concierge__byline-role">Senior Concierge · SafariVerse Studio</div>
+        </div>
+      </div>
+      <hr class="hairline" style="margin: 24px 0;" />
+      <p class="body-editorial" style="font-size: 15px; max-width: 480px;">Every dream draft you save begins a quiet conversation with a real person. Not a chatbot, not a form — a concierge who has walked these conservancies and met the guides by name.</p>
+      <div style="display:flex; gap: 16px; margin-top: 32px; flex-wrap: wrap;">
+        <a class="cta-pill" href="Honeymoon in Kenya.html">
+          <span class="cta-pill__glyph">✦</span>
+          Read an Edition
+        </a>
+        <a class="cta-ghost" href="#">Talk to Asha First →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───── FOOTER ───── -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div>
+      <div class="footer__masthead">SafariVerse<span style="color:var(--ember); margin-left:8px;">✦</span></div>
+      <p class="footer__tag">A cinematic universe of African safari editions, built by the storytellers who live there.</p>
+    </div>
+    <div class="footer__col">
+      <h4>The Studio</h4>
+      <ul>
+        <li><a href="#">Editions</a></li>
+        <li><a href="#">Destinations</a></li>
+        <li><a href="#">Storytellers</a></li>
+        <li><a href="#">Concierge</a></li>
+      </ul>
+    </div>
+    <div class="footer__col">
+      <h4>The Edit</h4>
+      <ul>
+        <li><a href="#">This week</a></li>
+        <li><a href="#">Field journal</a></li>
+        <li><a href="#">Print posters</a></li>
+        <li><a href="#">Newsletter</a></li>
+      </ul>
+    </div>
+    <div class="footer__col">
+      <h4>The House</h4>
+      <ul>
+        <li><a href="#">For creators</a></li>
+        <li><a href="#">For operators</a></li>
+        <li><a href="#">Editorial standards</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer__base">
+    <div>Edition 01 &nbsp;·&nbsp; safariverse.com &nbsp;·&nbsp; 2026</div>
+    <div>Privacy &nbsp;·&nbsp; Terms &nbsp;·&nbsp; Photography license</div>
+  </div>
+</footer>
+
+<script>
+  // shrink topbar on scroll
+  const topbar = document.getElementById('topbar');
+  window.addEventListener('scroll', () => {
+    topbar.classList.toggle('is-scrolled', window.scrollY > 40);
+  }, { passive: true });
+</script>
+
+</body>
+</html>
