@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SafariVerse — Three Editions, One Universe</title>
+<link rel="stylesheet" href="editorial.css" />
+<style>
+  /* ============ PAGE ============ */
+  body { background: var(--paper-cream); color: var(--ink-deep); overflow-x: hidden; }
+
+  /* ============ TOP BAR (paper variant) ============ */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 22px 40px;
+    transition: background 400ms var(--ease-out), backdrop-filter 400ms var(--ease-out);
+  }
+  .topbar.is-scrolled {
+    background: rgba(245,241,234,0.94);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--divider-light);
+    padding: 14px 40px;
+  }
+  .topbar__left { display: flex; align-items: center; gap: 14px; }
+  .wordmark {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 22px;
+    letter-spacing: 0.02em;
+    color: var(--ink-deep);
+    text-decoration: none;
+  }
+  .wordmark sup {
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--ember);
+    margin-left: 6px;
+    vertical-align: super;
+  }
+  .topbar__nav { display: flex; gap: 32px; align-items: center; justify-content: center; }
+  .topbar__link {
+    color: var(--ink-muted);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .topbar__link:hover { color: var(--ink-deep); }
+  .topbar__right { display: flex; gap: 12px; align-items: center; justify-content: flex-end; }
+  .topbar__icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--divider-light);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--ink-deep);
+    background: transparent;
+  }
+  .topbar__avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: url('https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=200&q=80') center/cover;
+    border: 1px solid var(--divider-light);
+  }
+
+  /* ============ HERO HEADLINE STRIP ============ */
+  .hero-head {
+    padding: 152px 48px 36px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+    gap: 48px;
+    max-width: 1480px;
+    margin: 0 auto;
+  }
+  .hero-head__eyebrow {
+    color: var(--ember-stamp);
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-head__eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 36px; height: 1px;
+    background: var(--ember-stamp);
+  }
+  .hero-head__title {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-variation-settings: 'opsz' 144;
+    font-size: clamp(40px, 5.4vw, 72px);
+    line-height: 1.04;
+    letter-spacing: -0.015em;
+    color: var(--ink-deep);
+    margin: 16px 0 0;
+    max-width: 12ch;
+  }
+  .hero-head__sub {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(17px, 1.6vw, 22px);
+    line-height: 1.45;
+    color: var(--ink-body);
+    max-width: 44ch;
+    margin: 0 0 12px;
+  }
+  .hero-head__cta-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .ghost-link {
+    color: var(--ink-deep);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--ink-deep);
+    padding-bottom: 4px;
+    transition: opacity 200ms;
+  }
+  .ghost-link:hover { opacity: 0.55; }
+
+  /* ============ HERO GRID (3 EDITION CARDS) ============ */
+  .hero-grid {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 16px 48px 64px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+  }
+
+  /* ============ EDITION HERO CARD ============ */
+  .ehc {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    background: var(--paper-aged);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 600ms var(--ease-out), box-shadow 600ms var(--ease-out);
+  }
+  .ehc:hover:not(.is-open) {
+    transform: translateY(-4px);
+  }
+  .ehc:hover:not(.is-open) .ehc__photo {
+    transform: scale(1.04);
+  }
+  .ehc.is-open {
+    cursor: default;
+    aspect-ratio: 2 / 3;
+    background: var(--paper-cream);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.18), 0 8px 16px rgba(0,0,0,0.12);
+    z-index: 5;
+  }
+
+  /* ---- POSTER FACE ---- */
+  .ehc__face {
+    position: absolute; inset: 0;
+    opacity: 1;
+    transition: opacity 350ms var(--ease-out);
+  }
+  .ehc.is-open .ehc__face { opacity: 0; pointer-events: none; }
+
+  .ehc__photo {
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 1200ms var(--ease-out);
+  }
+  .ehc__frame {
+    position: absolute; inset: 14px;
+    border: 1px solid rgba(245,241,234,0.6);
+    pointer-events: none;
+  }
+  .ehc__scrim {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg,
+      rgba(15,14,12,0.30) 0%,
+      rgba(15,14,12,0) 30%,
+      rgba(15,14,12,0) 55%,
+      rgba(15,14,12,0.78) 100%);
+  }
+  .ehc__face-inner {
+    position: absolute; inset: 14px;
+    padding: 22px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: var(--ink-bright);
+  }
+  .ehc__masthead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(245,241,234,0.85);
+  }
+  .ehc__masthead .ember { color: var(--ember-soft); }
+  .ehc__bottom { display: flex; flex-direction: column; gap: 10px; }
+  .ehc__title {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-variation-settings: 'opsz' 144;
+    font-size: clamp(28px, 3.2vw, 40px);
+    line-height: 1.02;
+    letter-spacing: -0.005em;
+    color: var(--ink-bright);
+    margin: 0;
+  }
+  .ehc__rule {
+    width: 48px; height: 1px;
+    background: var(--ink-bright);
+    opacity: 0.7;
+  }
+  .ehc__meta {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 13px;
+    color: rgba(245,241,234,0.85);
+  }
+  .ehc__hint {
+    position: absolute;
+    bottom: 36px;
+    right: 36px;
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(245,241,234,0.65);
+    transition: opacity 300ms, transform 300ms;
+  }
+  .ehc:hover:not(.is-open) .ehc__hint {
+    color: var(--ember-soft);
+    transform: translateX(2px);
+  }
+
+  /* ---- OPEN FACE — DAY SPREAD INSIDE CARD ---- */
+  .ehc__open {
+    position: absolute; inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 400ms var(--ease-out);
+    background: var(--paper-cream);
+    display: flex;
+    flex-direction: column;
+  }
+  .ehc.is-open .ehc__open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .ehc__open-pad {
+    padding: 22px 24px 18px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* open header row: ordinal + close */
+  .ehc__open-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+  .ehc__ordinal {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-variation-settings: 'opsz' 144;
+    font-size: 64px;
+    line-height: 0.9;
+    color: var(--ember-stamp);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .ehc__day-eyebrow {
+    margin-top: 4px;
+    color: var(--ember-stamp);
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+  .ehc__close {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1px solid var(--divider-light);
+    background: transparent;
+    color: var(--ink-deep);
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1;
+    transition: background 200ms, color 200ms;
+  }
+  .ehc__close:hover {
+    background: var(--ink-deep);
+    color: var(--paper-cream);
+  }
+  .ehc__day-acacia {
+    width: 48px; height: 1px;
+    background: var(--acacia-rule);
+    margin: 8px 0 12px;
+  }
+  .ehc__day-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-variation-settings: 'opsz' 144;
+    font-size: 26px;
+    line-height: 1.05;
+    color: var(--ink-deep);
+    margin: 0 0 4px;
+  }
+  .ehc__day-sub {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 13px;
+    color: var(--ink-body);
+    margin: 0 0 14px;
+  }
+
+  .ehc__day-photo {
+    aspect-ratio: 16 / 9;
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 6px;
+  }
+  .ehc__day-caption {
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 10px;
+  }
+  .ehc__day-narrative {
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 400;
+    line-height: 1.55;
+    color: var(--ink-body);
+    margin: 0 0 12px;
+    /* clamp to roughly 4 lines */
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ehc__lodge {
+    border-top: 1px solid var(--divider-light);
+    padding-top: 8px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ehc__lodge-eye {
+    color: var(--ember-stamp);
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .ehc__lodge-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: var(--ink-deep);
+  }
+  .ehc__lodge-loc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 11px;
+    color: var(--ink-body);
+  }
+
+  /* compact Sources & Attribution panel (2-col inside card) */
+  .ehc__attr {
+    background: var(--canvas-sand);
+    border-left: 2px solid var(--ember);
+    padding: 10px 12px 12px;
+    margin-bottom: 12px;
+  }
+  .ehc__attr-head {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 8px;
+  }
+  .ehc__attr-mark {
+    color: var(--ember);
+    font-size: 10px;
+  }
+  .ehc__attr-title {
+    color: var(--ember-stamp);
+    font-family: 'Inter', sans-serif;
+    font-size: 8.5px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .ehc__attr-rule {
+    flex: 1; height: 1px;
+    background: var(--acacia-rule);
+    opacity: 0.55;
+  }
+  .ehc__attr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .ehc__attr-col-eye {
+    font-family: 'Inter', sans-serif;
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 4px;
+  }
+  .ehc__attr-credit {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink-deep);
+    line-height: 1.3;
+  }
+  .ehc__attr-credit em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    color: var(--ink-body);
+    font-size: 10.5px;
+    margin-left: 2px;
+  }
+  .ehc__attr-review {
+    display: flex; align-items: center; gap: 5px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    color: var(--ink-body);
+    margin-bottom: 2px;
+  }
+  .ehc__attr-review .score {
+    color: var(--ember-stamp);
+    font-family: 'Fraunces', serif;
+    font-weight: 400;
+    font-size: 12px;
+  }
+  .ehc__attr-review .stars {
+    color: var(--ember);
+    letter-spacing: 0.1em;
+    font-size: 9px;
+  }
+  .ehc__attr-review .count {
+    color: var(--ink-muted);
+    font-size: 9px;
+  }
+
+  /* footer of open card: pager + open-in-full */
+  .ehc__foot {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 0.5px solid var(--divider-light);
+  }
+  .ehc__pager {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .ehc__pager-btn {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--divider-light);
+    background: transparent;
+    color: var(--ink-deep);
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    line-height: 1;
+    transition: background 200ms, color 200ms;
+  }
+  .ehc__pager-btn:hover:not(:disabled) {
+    background: var(--ink-deep);
+    color: var(--paper-cream);
+  }
+  .ehc__pager-btn:disabled { opacity: 0.3; cursor: default; }
+  .ehc__pager-count {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .ehc__full-link {
+    color: var(--ember-stamp);
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--ember-stamp);
+    padding-bottom: 2px;
+    transition: color 200ms, border-color 200ms;
+  }
+  .ehc__full-link:hover {
+    color: var(--ember);
+    border-color: var(--ember);
+  }
+
+  /* below-grid caption row */
+  .hero-foot {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 12px 48px 96px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 0.5px solid var(--divider-light);
+  }
+  .hero-foot__l {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .hero-foot__r {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 14px;
+    color: var(--ink-body);
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1024px) {
+    .hero-head { grid-template-columns: 1fr; gap: 24px; }
+    .hero-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 700px) {
+    .hero-head { padding: 120px 24px 24px; }
+    .hero-grid { grid-template-columns: 1fr; padding: 12px 24px 48px; }
+    .hero-foot { flex-direction: column; gap: 8px; align-items: flex-start; padding: 12px 24px 64px; }
+    .topbar { padding: 16px 20px; grid-template-columns: 1fr auto; }
+    .topbar__nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<script>
+  /* Three Editions (stub data for the hero demo).
+     In production these come from the Editions API.
+     Each has a hero image (used as the closed-card poster face)
+     and a `days` array used by the open-card flipbook. */
+  window.EDITIONS = [
+    {
+      id: "honeymoon-kenya-12d",
+      number: "01",
+      label: "The Honeymoon Edition",
+      title: "Honeymoon in Kenya",
+      meta: "twelve days · golden hour",
+      year: "2026",
+      hero: "https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=1600&q=85",
+      hero_caption: "Karen, Nairobi",
+      hero_credit: "Jane Doe",
+      days: [
+        {
+          n: "01", title: "Nairobi", sub: "to the foot of the mountain",
+          photo: "https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=1200&q=85",
+          photo_caption: "Hemingways · Karen · Jane Doe",
+          narrative: "You arrive when the jacaranda is falling. Karen sits at the foot of the Ngong Hills like a town that learned, very early, that the right thing to do at five in the afternoon is nothing.",
+          lodge: { name: "Hemingways Nairobi", location: "Karen, Nairobi" },
+          credit_role: "Photography", credit_name: "Jane Doe", credit_platform: "Instagram",
+          reviews: [
+            { platform: "TripAdvisor", score: 4.7, count: 1247 },
+            { platform: "Google", score: 4.6, count: 892 }
+          ]
+        },
+        {
+          n: "03", title: "Lewa Conservancy", sub: "the rhinos and the long view",
+          photo: "https://images.unsplash.com/photo-1521651201144-634f700b36ef?w=1200&q=85",
+          photo_caption: "Lewa at first light · Mwende Otieno",
+          narrative: "The plane drops you onto a strip of red dust at seven in the morning and a Land Cruiser is already there, idling, with a thermos of coffee on the dash and a guide who has the long view in his eyes.",
+          lodge: { name: "Lewa Wilderness", location: "Lewa Conservancy" },
+          credit_role: "Field Journal", credit_name: "Mwende Otieno", credit_platform: "Blog",
+          reviews: [
+            { platform: "TripAdvisor", score: 4.9, count: 612 },
+            { platform: "Google", score: 4.8, count: 287 }
+          ]
+        },
+        {
+          n: "05", title: "Maasai Mara", sub: "the long grass",
+          photo: "https://images.unsplash.com/photo-1547721064-da6cfb341d50?w=1200&q=85",
+          photo_caption: "Mara Plains · Ahmed Hassan",
+          narrative: "On the fifth morning the guide stands once on your tent at five-fifteen and does not knock a second time. You wait for the rain to stop falling, which it has already done — without ceremony, very quickly, orange — setting fire to the grass.",
+          lodge: { name: "Mara Plains Camp", location: "Olare Motorogi Conservancy" },
+          credit_role: "Photography", credit_name: "Ahmed Hassan", credit_platform: "YouTube",
+          reviews: [
+            { platform: "TripAdvisor", score: 4.9, count: 894 },
+            { platform: "Google", score: 4.9, count: 412 }
+          ]
+        }
+      ]
+    },
+    {
+      id: "migration-edition-09d",
+      number: "07",
+      label: "The Migration Edition",
+      title: "The Great Crossing",
+      meta: "nine days · river season",
+      year: "2026",
+      hero: "https://images.unsplash.com/photo-1547721064-da6cfb341d50?w=1600&q=85",
+      hero_caption: "Mara River crossing",
+      hero_credit: "Ahmed Hassan",
+      days: [
+        {
+          n: "01", title: "Nairobi", sub: "the slow approach",
+          photo: "https://images.unsplash.com/photo-1611348586804-61bf6c080437?w=1200&q=85",
+          photo_caption: "Karen · Jane Doe",
+          narrative: "You land at dusk and the city smells of rain and bougainvillea. The first night is a still one, by design — the migration will not be hurried, and neither, for these twelve hours, will you.",
+          lodge: { name: "Giraffe Manor", location: "Karen, Nairobi" },
+          credit_role: "Photography", credit_name: "Jane Doe", credit_platform: "Instagram",
+          reviews: [
+            { platform: "TripAdvisor", score: 4.8, count: 2104 },
+            { platform: "Google", score: 4.7, count: 1389 }
+          ]
+        },
+        {
+          n: "03", title: "Mara Triangle", sub: "the long approach",
+          photo: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=1200&q=85",
+          photo_caption: "Mara plains at dawn · Mwende Otieno",
+          narrative: "The plane crosses the escarpment and the grass below is the colour of an old lion. Your guide is waiting and his radio is already alive — somebody to the north has seen the herds turning back toward the river.",
+          lodge: { name: "Angama Mara", location: "Mara Triangle" },
+          credit_role: "Field Journal", credit_name: "Mwende Otieno", credit_platform: "Blog",
+          reviews: [
+            { platform: "TripAdvisor", score: 4.9, count: 1654 },
+            { platform: "Google", score: 4.9, count: 821 }
+          ]
+        },
+        {
+          n: "05", title: "The Crossing", sub: "what you came for",
+          photo: "https://images.unsplash.com/photo-1547721064-da6cfb341d50?w=1200&q=85",
+          photo_caption: "The crossing · Ahmed Hassan",
+          narrative: "You wait six hours at the bend in the river and then, in five minutes, the year happens. The first wildebeest goes down the bank like an act of faith. The rest follow. Your guide does not narrate. You will not need him to.",
+          lodge: { name: "Sala's Camp", location: "Mara Triangle" },
+          credit_role: "Photography", credit_name: "Ahmed Hassan", credit_platform: "YouTube",
+          reviews: [
+            { platform: "TripAdvisor", score: 4.9, count: 743 },
+            { platform: "Google", score: 4.9, count: 298 }
+          ]
+        }
+      ]
+    },
+    {
+      id: "quiet-luxury-mara-10d",
+      number: "12",
+      label: "The Quiet Edition",
+      title: "Slow Days in the Mara",
+      meta: "ten days · low season",
+      year: "2026",
+      hero: "https://images.unsplash.com/photo-1521651201144-634f700b36ef?w=1600&q=85",
+      hero_caption: "An elephant at the foot of the hill",
+      hero_credit: "Mwende Otieno",
+      days: [
+        {
+          n: "02", title: "Loita Hills", sub: "above the dust",
+          photo: "https://images.unsplash.com/photo-1521651201144-634f700b36ef?w=1200&q=85",
+          photo_caption: "Loita · Mwende Otieno",
+          narrative: "The Loita Hills are quiet enough that the only sound for an hour is the wind running through the wild olive, and the bell on a single distant cow whose owner you will never meet.",
+          lodge: { name: "Loita Hills Camp", location: "Loita, southern Kenya" },
+          credit_role: "Field Journal", credit_name: "Mwende Otieno", credit_platform: "Blog",
+          reviews: [
+            { platform: "TripAdvisor", score: 4.8, count: 312 },
+            { platform: "Google", score: 4.8, count: 154 }
+          ]
+        },
+        {
+          n: "05", title: "The Long Grass", sub: "and the long view",
+          photo: "https://images.unsplash.com/photo-1604608672516-f1b9b1d1f1eb?w=1200&q=85",
+          photo_caption: "Mara, season's end · Ahmed Hassan",
+          narrative: "On the fifth morning the guide stands once on your tent at five-fifteen, and does not knock a second time. You wait for the rain to stop falling, which it has already done — without ceremony — very quickly, orange — setting fire to the grass.",
+          lodge: { name: "Cottar's 1920s Camp", location: "Olderkesi Conservancy" },
+          credit_role: "Photography", credit_name: "Ahmed Hassan", credit_platform: "YouTube",
+          reviews: [
+            { platform: "TripAdvisor", score: 4.9, count: 1023 },
+            { platform: "Google", score: 4.9, count: 487 }
+          ]
+        },
+        {
+          n: "08", title: "Diani", sub: "the last fire",
+          photo: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=85",
+          photo_caption: "Diani at the long blue hour · Jane Doe",
+          narrative: "You spend the last three days where the Indian Ocean has been doing its slow blue work for longer than anyone has been counting. The verandahs face the water. The water faces you back.",
+          lodge: { name: "Almanara Diani", location: "Diani Beach, south coast" },
+          credit_role: "Photography", credit_name: "Jane Doe", credit_platform: "Instagram",
+          reviews: [
+            { platform: "TripAdvisor", score: 4.8, count: 587 },
+            { platform: "Google", score: 4.7, count: 264 }
+          ]
+        }
+      ]
+    }
+  ];
+</script>
+
+<script type="text/babel">
+  const { useState, useEffect, useRef } = React;
+  const ROOT = ReactDOM.createRoot(document.getElementById('root'));
+
+  function TopBar() {
+    const [scrolled, setScrolled] = useState(false);
+    useEffect(() => {
+      const onScroll = () => setScrolled(window.scrollY > 40);
+      window.addEventListener('scroll', onScroll, { passive: true });
+      return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+    return (
+      <header className={`topbar ${scrolled ? 'is-scrolled' : ''}`}>
+        <div className="topbar__left">
+          <a href="#" className="wordmark">SafariVerse<sup>✦</sup></a>
+        </div>
+        <nav className="topbar__nav">
+          <a href="#" className="topbar__link">Editions</a>
+          <a href="#" className="topbar__link">Storytellers</a>
+          <a href="#" className="topbar__link">Destinations</a>
+          <a href="#" className="topbar__link">Studio</a>
+        </nav>
+        <div className="topbar__right">
+          <button className="topbar__icon" aria-label="Search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          </button>
+          <div className="topbar__avatar" aria-label="Account" />
+        </div>
+      </header>
+    );
+  }
+
+  function ReviewLine({ r }) {
+    const stars = '★'.repeat(Math.round(r.score));
+    return (
+      <div className="ehc__attr-review">
+        <span style={{ fontWeight: 600 }}>{r.platform}</span>
+        <span className="score">{r.score.toFixed(1)}</span>
+        <span className="stars">{stars}</span>
+        <span className="count">({r.count.toLocaleString()})</span>
+      </div>
+    );
+  }
+
+  function EditionHeroCard({ edition }) {
+    const [open, setOpen] = useState(false);
+    const [idx, setIdx] = useState(0);
+    const cardRef = useRef(null);
+
+    const days = edition.days;
+    const day = days[idx];
+
+    /* ESC closes; ← → paginate when open */
+    useEffect(() => {
+      if (!open) return;
+      const onKey = (e) => {
+        if (e.key === 'Escape') { setOpen(false); return; }
+        if (e.key === 'ArrowRight' && idx < days.length - 1) setIdx(idx + 1);
+        if (e.key === 'ArrowLeft' && idx > 0) setIdx(idx - 1);
+      };
+      window.addEventListener('keydown', onKey);
+      return () => window.removeEventListener('keydown', onKey);
+    }, [open, idx, days.length]);
+
+    return (
+      <article
+        ref={cardRef}
+        className={`ehc ${open ? 'is-open' : ''}`}
+        onClick={() => { if (!open) setOpen(true); }}
+      >
+        {/* CLOSED FACE — Atlas-Poster preview */}
+        <div className="ehc__face">
+          <div className="ehc__photo" style={{ backgroundImage: `url(${edition.hero})` }} />
+          <div className="ehc__scrim" />
+          <div className="ehc__frame" />
+          <div className="ehc__face-inner">
+            <div className="ehc__masthead">
+              <span><span className="ember">✦</span> Edition {edition.number}</span>
+              <span>{edition.label}</span>
+            </div>
+            <div className="ehc__bottom">
+              <h3 className="ehc__title">{edition.title}</h3>
+              <div className="ehc__rule" />
+              <div className="ehc__meta">{edition.meta}</div>
+            </div>
+          </div>
+          <div className="ehc__hint">Open ↗</div>
+        </div>
+
+        {/* OPEN FACE — Day spread inside the card */}
+        <div className="ehc__open" onClick={(e) => e.stopPropagation()}>
+          <div className="ehc__open-pad">
+            <div className="ehc__open-head">
+              <div>
+                <div className="ehc__ordinal">{day.n}</div>
+                <div className="ehc__day-eyebrow">Day {parseInt(day.n, 10)} · {edition.label}</div>
+              </div>
+              <button className="ehc__close" aria-label="Close" onClick={() => setOpen(false)}>×</button>
+            </div>
+            <div className="ehc__day-acacia" />
+            <h4 className="ehc__day-title">{day.title}</h4>
+            <div className="ehc__day-sub">{day.sub}</div>
+
+            <div className="ehc__day-photo" style={{ backgroundImage: `url(${day.photo})` }} />
+            <div className="ehc__day-caption">{day.photo_caption}</div>
+
+            <p className="ehc__day-narrative">{day.narrative}</p>
+
+            <div className="ehc__lodge">
+              <div className="ehc__lodge-eye">The Lodge</div>
+              <div className="ehc__lodge-name">{day.lodge.name}</div>
+              <div className="ehc__lodge-loc">{day.lodge.location}</div>
+            </div>
+
+            <div className="ehc__attr">
+              <div className="ehc__attr-head">
+                <span className="ehc__attr-mark">✦</span>
+                <span className="ehc__attr-title">Sources &amp; Attribution</span>
+                <span className="ehc__attr-rule" />
+              </div>
+              <div className="ehc__attr-grid">
+                <div>
+                  <div className="ehc__attr-col-eye">Credit</div>
+                  <div className="ehc__attr-credit">
+                    {day.credit_name}
+                    <em>· {day.credit_platform}</em>
+                  </div>
+                  <div className="ehc__attr-credit" style={{ marginTop: 4, color: 'var(--ink-muted)', fontSize: 9.5, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 600 }}>
+                    {day.credit_role}
+                  </div>
+                </div>
+                <div>
+                  <div className="ehc__attr-col-eye">Travellers Say</div>
+                  {day.reviews.map((r, i) => <ReviewLine key={i} r={r} />)}
+                </div>
+              </div>
+            </div>
+
+            <div className="ehc__foot">
+              <div className="ehc__pager">
+                <button
+                  className="ehc__pager-btn"
+                  onClick={() => setIdx(Math.max(0, idx - 1))}
+                  disabled={idx === 0}
+                  aria-label="Previous day"
+                >‹</button>
+                <div className="ehc__pager-count">
+                  {String(idx + 1).padStart(2,'0')} / {String(days.length).padStart(2,'0')}
+                </div>
+                <button
+                  className="ehc__pager-btn"
+                  onClick={() => setIdx(Math.min(days.length - 1, idx + 1))}
+                  disabled={idx === days.length - 1}
+                  aria-label="Next day"
+                >›</button>
+              </div>
+              <a className="ehc__full-link" href={`Edition.html?slug=${edition.id}`}>
+                Open in full page →
+              </a>
+            </div>
+          </div>
+        </div>
+      </article>
+    );
+  }
+
+  function App() {
+    return (
+      <>
+        <TopBar />
+
+        <section className="hero-head">
+          <div>
+            <div className="hero-head__eyebrow">SafariVerse · This week's editions</div>
+            <h1 className="hero-head__title">Where the wild ones whisper.</h1>
+          </div>
+          <div>
+            <p className="hero-head__sub">
+              Three editions, three lenses. Open one to read a day; open it in full to live the whole journey.
+            </p>
+            <div className="hero-head__cta-row">
+              <a href="#" className="ghost-link">All editions →</a>
+            </div>
+          </div>
+        </section>
+
+        <section className="hero-grid">
+          {window.EDITIONS.map((e) => (
+            <EditionHeroCard key={e.id} edition={e} />
+          ))}
+        </section>
+
+        <section className="hero-foot">
+          <div className="hero-foot__l">Twelve days, four dreams, one journey.</div>
+          <div className="hero-foot__r">Click a card to preview a day. Click <em>Open in full page</em> to live the whole edition.</div>
+        </section>
+      </>
+    );
+  }
+
+  ROOT.render(<App />);
+</script>
+
+</body>
+</html>
