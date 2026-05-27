@@ -79,7 +79,30 @@ In Edition view, use the top-bar mode-switch pill to flip between Read, Lookbook
 
 ## Implementation target
 
-The design handoff is being ported to **Next.js 15 (App Router) + Tailwind + Framer Motion**, deployed to Vercel. Implementation lives in `web/` and follows the build order locked above — Scroll-Story first as the foundational mobile-native default with full JSON-LD `TouristTrip` schema for AI discoverability.
+The design handoff is being ported to **Next.js 15 (App Router) + Tailwind + Framer Motion**, deployed to **Railway** (app + Postgres + cron in one platform). Implementation lives in `web/` and follows the build order locked above — Scroll-Story first as the foundational mobile-native default with full JSON-LD `TouristTrip` schema for AI discoverability.
+
+### Stack
+
+| Layer | Choice |
+|---|---|
+| App | Next.js 15 (App Router) + TypeScript + Tailwind |
+| ORM | Drizzle |
+| DB | Railway Postgres (with pgvector + PostGIS) |
+| AI | Anthropic SDK (Claude Sonnet 4.6) |
+| Embeddings | Voyage AI |
+| Auth | Clerk |
+| Storage | Cloudflare R2 |
+| Hosting | Railway (web service + Postgres service + cron worker) |
+| Cron / queues | Inngest or QStash (calling Next.js API routes) |
+
+### Deploy to Railway
+
+1. Push to GitHub (this repo)
+2. In Railway, create a new project → Deploy from GitHub → select this repo
+3. Railway reads `railway.json` and builds the app from `/web`
+4. Add a Postgres service to the same project — Railway sets `DATABASE_URL` automatically
+5. Add the environment variables from `.env.example` to the Railway service
+6. Push again — Railway auto-deploys
 
 URL pattern:
 
